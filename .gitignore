@@ -23,3 +23,6 @@ PhysStates.nc
 BioStates.nc
 combined_coral_data.csv
 .DS_Store
+raw_data/
+processed_data/
+__pycache__/
