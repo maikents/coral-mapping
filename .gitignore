@@ -7,3 +7,4 @@ PhysStates.nc
 BioStates.nc
 raw_data/
 processed_data/
+__pycache__/
