@@ -21,6 +21,9 @@ KystOgFiskeri_64_Barentshavet_vest_25833_Korallrev_GML.gfs
 KystOgFiskeri_64_Barentshavet_vest_25833_Korallrev_GML.gml
 PhysStates.nc
 BioStates.nc
+raw_data/
+processed_data/
+__pycache__/
 combined_coral_data.csv
 .DS_Store
 raw_data/
