@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info version="1.1">
+  <general>
+    <createDate>2021-11-02T16:42:29</createDate>
+    <changeDate>2021-11-02T15:42:29</changeDate>
+    <schema>iso19139</schema>
+    <isTemplate>n</isTemplate>
+    <localId>55087</localId>
+    <format>full</format>
+    <rating>0</rating>
+    <popularity>425</popularity>
+    <uuid>c7b53704-999d-4721-b1a3-04ec60c87238</uuid>
+    <siteId>1754618d-b2ef-445e-9ab4-0f8854e51468</siteId>
+    <siteName>EMODnet Product Catalogue</siteName>
+  </general>
+  <categories>
+    <category name="EMODnet Bathymetry" />
+  </categories>
+  <privileges>
+    <group name="all">
+      <operation name="view" />
+      <operation name="dynamic" />
+      <operation name="download" />
+    </group>
+  </privileges>
+  <public />
+  <private />
+</info>
+
