@@ -1,4 +1,5 @@
 processed_data/
+processed_data_maiken/
 __pycache__/
 combined_coral_data.csv
 .DS_Store
