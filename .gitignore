@@ -5,3 +5,4 @@ combined_coral_data.csv
 .DS_Store
 *.gfs
 *.nc
+raw_data/EMOD-tifs/
