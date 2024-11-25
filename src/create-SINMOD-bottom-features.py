@@ -1,5 +1,6 @@
 import xarray as xr
 import time 
+import os
 
 def process_bottom_layer_no_dask(
     file_path,
@@ -18,6 +19,15 @@ def process_bottom_layer_no_dask(
     Returns:
     - xarray.DataArray: The time-averaged bottom layer data.
     """
+
+    # Check if output path is valid
+    if output_path is not None:
+        output_dir = os.path.dirname(output_path)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        elif not os.access(output_dir, os.W_OK):
+            raise PermissionError(f"Write permission denied for the directory: {output_dir}")
+
     time_start = time.time()
 
     # Open the dataset
