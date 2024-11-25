@@ -13,8 +13,6 @@ def process_bottom_layer_no_dask(
     Parameters:
     - file_path (str): Path to the NetCDF file.
     - variable_name (str): Name of the variable to process.
-    - chunks (dict): Chunking strategy for the dataset.
-    - slice_dict (dict): Slicing parameters for the data (e.g., {"zc": slice(0, 10), "yc": slice(0, 10), "xc": slice(65, 75)}).
     - output_path (str): Path to save the processed file (optional). If None, the result is not saved.
     
     Returns:
