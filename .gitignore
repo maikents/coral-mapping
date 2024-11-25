@@ -2,6 +2,8 @@ processed_data/
 processed_data_maiken/
 __pycache__/
 combined_coral_data.csv
+PhysStates_2019.nc
+samp_2D_jan_jun.nc
 .DS_Store
 *.gfs
 *.nc
