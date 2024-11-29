@@ -5,4 +5,5 @@ combined_coral_data.csv
 .DS_Store
 *.gfs
 *.nc
-raw_data/EMOD-tifs/
+raw_data/EMOD-tifs/.ipynb_checkpoints/
+.venv/
