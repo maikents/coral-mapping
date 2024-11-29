@@ -7,3 +7,4 @@ combined_coral_data.csv
 *.nc
 raw_data/EMOD-tifs/.ipynb_checkpoints/
 .venv/
+.ipynb_checkpoints/
