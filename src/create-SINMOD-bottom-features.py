@@ -38,6 +38,19 @@ def process_bottom_layer_no_dask(
     # Extract the variable
     if variable_name == "current_speed":
         data_var = ds["u_velocity"]
+        #data_var = np.sqrt(ds["u_velocity"]**2 + ds["v_velocity"]**2)
+
+    elif variable_name == "statistical_nortness" or variable_name == "statistical_eastness":
+        longitude = ds["gridLons"]
+        longitude_of_projection_origin = ds["grid_mapping"].getncattr("longitude_of_projection_origin")
+        theta = longitude - longitude_of_projection_origin
+        eastward_velocity = ds"'u_velocity"]* np.cos(np.deg2rad(theta)) - ds["v_velocity"]* np.sin(np.deg2rad(theta))
+        northward_velocity = ds["u_velocity"]* np.sin(np.deg2rad(theta)) + ds["v_velocity"]* np.cos(np.deg2rad(theta))
+        aspect = np.arctan2(eastward_velocity, northward_velocity)
+        if variable_name == 'statistical_eastness':
+                        data_var = np.sin(aspect)
+        else:
+                        data_var = np.cos(aspect)
     else:
         data_var = ds[variable_name]
     
