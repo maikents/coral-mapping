@@ -1,9 +1,12 @@
 import xarray as xr
 import time 
 import os
+from netCDF4 import Dataset
+import numpy as np
 
 def process_bottom_layer_no_dask(
     file_path,
+    gridLons, #to calculate statistical northness and eastness
     variable_name,
     #chunks={"time":-1, "zc": -1, "yc": 50, "xc": 50},
     output_path=None
@@ -40,17 +43,9 @@ def process_bottom_layer_no_dask(
         data_var = ds["u_velocity"]
         #data_var = np.sqrt(ds["u_velocity"]**2 + ds["v_velocity"]**2)
 
-    elif variable_name == "statistical_nortness" or variable_name == "statistical_eastness":
-        longitude = ds["gridLons"]
-        longitude_of_projection_origin = ds["grid_mapping"].getncattr("longitude_of_projection_origin")
-        theta = longitude - longitude_of_projection_origin
-        eastward_velocity = ds"'u_velocity"]* np.cos(np.deg2rad(theta)) - ds["v_velocity"]* np.sin(np.deg2rad(theta))
-        northward_velocity = ds["u_velocity"]* np.sin(np.deg2rad(theta)) + ds["v_velocity"]* np.cos(np.deg2rad(theta))
-        aspect = np.arctan2(eastward_velocity, northward_velocity)
-        if variable_name == 'statistical_eastness':
-                        data_var = np.sin(aspect)
-        else:
-                        data_var = np.cos(aspect)
+    elif variable_name == "statistical_northness" or variable_name == "statistical_eastness":
+        data_var = ds["u_velocity"]
+
     else:
         data_var = ds[variable_name]
     
@@ -66,13 +61,38 @@ def process_bottom_layer_no_dask(
 
     # Ensure bottom_layer_idx does not go negative (e.g., if all values are invalid in a column)
     bottom_layer_idx = bottom_layer_idx.clip(min=0)
-    
+
+    #try this
+    #bottom_layer_idx_flat = bottom_layer_idx.values.flatten()
+    #yc, xc = np.meshgrid(data_var.yc.values, data_var.xc.values, indexing='ij')
+    #yc_flat = yc.flatten().astype(int)
+    #xc_flat = xc.flatten().astype(int)
+    #yc_flat = np.clip(yc_flat, 0, 554)  # because yc and xc have size 555
+    #xc_flat = np.clip(xc_flat, 0, 554)
+
     # Step 3: Extract the bottom layer data across all time steps
     if variable_name == "current_speed":
         bottom_layer_data = (data_var.isel(zc=bottom_layer_idx)**2 + ds["v_velocity"].isel(zc=bottom_layer_idx)**2)**0.5
+        
+    elif variable_name == "statistical_northness" or variable_name == "statistical_eastness":
+        longitude_of_projection_origin = ds["grid_mapping"].attrs["longitude_of_projection_origin"]
+        theta = gridLons - longitude_of_projection_origin
+        print(data_var.isel(zc=bottom_layer_idx))
+        eastward_velocity = data_var.isel(zc=bottom_layer_idx)* np.cos(np.deg2rad(theta)) - ds["v_velocity"].isel(zc=bottom_layer_idx)*np.sin(np.deg2rad(theta))
+        northward_velocity = data_var.isel(zc=bottom_layer_idx)* np.sin(np.deg2rad(theta)) + ds["v_velocity"].isel(zc=bottom_layer_idx)* np.cos(np.deg2rad(theta))
+        aspect = np.arctan2(eastward_velocity, northward_velocity)
+        if variable_name == 'statistical_eastness':
+            print("halloo")
+            bottom_layer_data = np.sin(aspect)
+        else:
+            bottom_layer_data = np.cos(aspect)
+        
     else:
         bottom_layer_data = data_var.isel(zc=bottom_layer_idx)
+        #bottom_layer_data = data_var.isel(zc=bottom_layer_idx_flat, yc=yc_flat, xc=xc_flat)
 
+
+        
     ds.close()
 
     print(f"\nExtracted the bottom layer data after {time.time() - time_start:.2f} seconds.\n\nStarting computation of statistics...")
@@ -103,4 +123,11 @@ def process_bottom_layer_no_dask(
 
 #process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "salinity", output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/salinity_bottom_features.nc")
 
-process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "current_speed", output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/current_speed_bottom_features.nc")
+#process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "current_speed", output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/current_speed_bottom_features.nc")
+
+filename_physstates_2d = '/cluster/projects/itk-SINMOD/coral-mapping/midnor/samp_2D_jan_jun.nc'
+physstates_2d = Dataset(filename_physstates_2d, 'r')
+gridLons = physstates_2d.variables['gridLons']
+
+#Run on statistical northness
+process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", gridLons, "statistical_eastness", output_path="/cluster/home/maikents/coral-mapping/processed_data/features/statistical_eastness_features.nc")
