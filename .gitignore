@@ -7,6 +7,6 @@ samp_2D_jan_jun.nc
 .DS_Store
 *.gfs
 *.nc
-raw_data/EMOD-tifs/.ipynb_checkpoints/
+raw_data/EMOD-tifs/
 .venv/
 .ipynb_checkpoints/

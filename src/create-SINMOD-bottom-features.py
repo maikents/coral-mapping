@@ -6,8 +6,8 @@ import numpy as np
 
 def process_bottom_layer_no_dask(
     file_path,
-    gridLons, #to calculate statistical northness and eastness
     variable_name,
+    gridLons=None, #to calculate statistical northness and eastness
     #chunks={"time":-1, "zc": -1, "yc": 50, "xc": 50},
     output_path=None
 ):
@@ -77,10 +77,12 @@ def process_bottom_layer_no_dask(
     elif variable_name == "statistical_northness" or variable_name == "statistical_eastness":
         longitude_of_projection_origin = ds["grid_mapping"].attrs["longitude_of_projection_origin"]
         theta = gridLons - longitude_of_projection_origin
-        print(data_var.isel(zc=bottom_layer_idx))
+        
         eastward_velocity = data_var.isel(zc=bottom_layer_idx)* np.cos(np.deg2rad(theta)) - ds["v_velocity"].isel(zc=bottom_layer_idx)*np.sin(np.deg2rad(theta))
         northward_velocity = data_var.isel(zc=bottom_layer_idx)* np.sin(np.deg2rad(theta)) + ds["v_velocity"].isel(zc=bottom_layer_idx)* np.cos(np.deg2rad(theta))
+
         aspect = np.arctan2(eastward_velocity, northward_velocity)
+
         if variable_name == 'statistical_eastness':
             print("halloo")
             bottom_layer_data = np.sin(aspect)
@@ -89,9 +91,6 @@ def process_bottom_layer_no_dask(
         
     else:
         bottom_layer_data = data_var.isel(zc=bottom_layer_idx)
-        #bottom_layer_data = data_var.isel(zc=bottom_layer_idx_flat, yc=yc_flat, xc=xc_flat)
-
-
         
     ds.close()
 
@@ -114,9 +113,9 @@ def process_bottom_layer_no_dask(
 
     # Save to output file if specified
     if output_path:
-        stats_array.to_netcdf(output_path)
-    
-    return stats_array, bottom_layer_idx
+        stats_array.to_netcdf(output_path, mode='w')
+
+    return stats_array
 
 # Run on temperature data
 #process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "temperature", output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/temperature_bottom_features.nc")
@@ -130,4 +129,6 @@ physstates_2d = Dataset(filename_physstates_2d, 'r')
 gridLons = physstates_2d.variables['gridLons']
 
 #Run on statistical northness
-process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", gridLons, "statistical_eastness", output_path="/cluster/home/maikents/coral-mapping/processed_data/features/statistical_eastness_features.nc")
+process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "statistical_northness", gridLons, output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/statistical_northness_features.nc")
+
+# process_bottom_layer_no_dask("/cluster/projects/itk-SINMOD/coral-mapping/midnor/PhysStates_2019.nc", "statistical_eastness", gridLons, output_path="/cluster/home/haroldh/coral-mapping/processed_data/features/statistical_eastness_features.nc")
